@@ -155,7 +155,7 @@
 </div>
 
 <div class="form-row">
-    <label for="node-config-input-saveInterval"><i class="fa fa-area-chart fa-fw"></i> Saving interval</label>
+    <label for="node-config-input-saveInterval"><i class="fa fa-area-chart fa-fw"></i> History interval</label>
     <input type="number" style="width: 100px" min="0" id="node-config-input-saveInterval"> ms
 </div>
 
@@ -229,7 +229,7 @@
      </ul>
      New states default to <i>On</i>. States created with an earlier version use <i>On</i> if History is above 0, otherwise <i>Off</i>.</li>
    <li><b>History</b> - Number of state changes to keep. Set to 0 for no history. History no longer controls whether state is saved; use Persist for that.</li>
-   <li><b>Saving interval</b> - Minimum time in ms between history entries. State changes are always saved (if Persist is on); this only limits how often history is recorded. 0 (or empty) records every state change.</li>
+   <li><b>History interval</b> - Minimum time in ms between history entries. State changes are always saved (if Persist is on); this only limits how often history is recorded. 0 (or empty) records every state change.</li>
  </ul>
  <h4>Optional Metadata</h4>
  Expand the state definition with metadata. This can be used to guarantee a data type, convert units, and provide tags to help find state nodes.

@@ -91,7 +91,7 @@ are kept.
 
 Leftover `<name>.tmp` and `<name>.bkp.tmp` files from an interrupted write are removed on startup.
 
-The _Saving interval_ (ms) rate-limits recording history: a new history entry is only added if at least
+The _History interval_ (ms, config key `saveInterval`) rate-limits recording history: a new history entry is only added if at least
 this much time has passed since the previous one. It does not affect saving; with _Persist_ on, every state
 change is written to disk. A missing, empty or invalid value is treated as 0, meaning every state change is
 recorded in history.
