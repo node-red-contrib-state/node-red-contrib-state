@@ -75,10 +75,12 @@ describe('shared state persistence', function () {
     await s.io;
     return s;
   };
-  const warnings = () => helper.log().args
+  const logged = (level) => () => helper.log().args
     .map(a => a[0])
-    .filter(m => m && m.level === helper.log().WARN)
+    .filter(m => m && m.level === helper.log()[level])
     .map(m => m.msg);
+  const warnings = logged('WARN');
+  const errors = logged('ERROR');
 
   describe('migration defaults', function () {
     it('uses "on" for existing nodes with history and "off" without', function () {
@@ -282,20 +284,28 @@ describe('shared state persistence', function () {
       assert.equal(fs.existsSync(stateFile('st.corrupt')), false);
     });
 
-    it('reports the main file error when both files are unusable', async function () {
+    it('reports the main file error as an error when both files are unusable', async function () {
       fs.mkdirSync(stateDir());
       fs.writeFileSync(stateFile('st'), '{"value": 3, "prev"');
       fs.writeFileSync(stateFile('st.bkp'), 'not json either');
       const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
       assert.equal(s.initialized, false);
-      const w = warnings();
-      assert.ok(w.some(m => m.startsWith('State file is not valid, ignoring: ' + s.stateFile + ' (')), w.join('\n'));
-      assert.ok(!w.some(m => /restoring from backup|backup file is not valid/.test(m)), w.join('\n'));
+      const e = errors();
+      assert.ok(e.some(m => m.startsWith('State file is not valid, ignoring: ' + s.stateFile + ' (')), e.join('\n'));
+      assert.ok(!warnings().some(m => /not valid|restoring from backup/.test(m)), warnings().join('\n'));
       assert.equal(fs.existsSync(stateFile('st.corrupt')), false);
       // The next save replaces both
       await s.update(1);
       assert.equal(JSON.parse(read('st')).value, 1);
       assert.equal(read('st.bkp'), read('st'));
+    });
+
+    it('reports a corrupt main file as an error when there is no backup', async function () {
+      fs.mkdirSync(stateDir());
+      fs.writeFileSync(stateFile('st'), 'not json');
+      const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
+      assert.equal(s.initialized, false);
+      assert.ok(errors().some(m => /^State file is not valid, ignoring: /.test(m)), errors().join('\n'));
     });
 
     it('removes stale .tmp files of both the main file and the backup on load', async function () {
