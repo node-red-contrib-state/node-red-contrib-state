@@ -91,8 +91,10 @@ are kept.
 
 Leftover `<name>.tmp` and `<name>.bkp.tmp` files from an interrupted write are removed on startup.
 
-The _Saving interval_ (ms) rate-limits recording history and saving to disk. A missing, empty or invalid
-value is treated as 0, meaning every state change is recorded and saved.
+The _Saving interval_ (ms) rate-limits recording history: a new history entry is only added if at least
+this much time has passed since the previous one. It does not affect saving; with _Persist_ on, every state
+change is written to disk. A missing, empty or invalid value is treated as 0, meaning every state change is
+recorded in history.
 
 Each state is written to a file in a _./shared-state_ directory within the current Node-RED application
 directory. If that isn't a good place to save state on your system, the global context _sharedStateDir_ 

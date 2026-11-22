@@ -369,12 +369,35 @@ describe('shared state persistence', function () {
       });
     }
 
-    it('still rate-limits with a valid saveInterval', async function () {
+    it('rate-limits history with a valid saveInterval, but saves every change', async function () {
       const s = await load({ persist: 'on', historyCount: 3, saveInterval: '60000' });
       await s.update(1);
       await s.update(2);
+      await s.update(3);
       assert.deepEqual(s.history.map(h => h.val), [1]);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 1);
+      const saved = JSON.parse(fs.readFileSync(stateFile('st'), 'utf8'));
+      assert.equal(saved.value, 3);
+      assert.equal(saved.prev, 2);
+      assert.deepEqual(saved.history.map(h => h.val), [1]);
+    });
+
+    it('saves every change despite saveInterval, also to the backup and without history', async function () {
+      const s = await load({ persist: 'on+backup', historyCount: 0, saveInterval: '60000' });
+      for (const v of [1, 2, 3]) {
+        await s.update(v);
+        assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, v);
+        assert.equal(JSON.parse(fs.readFileSync(stateFile('st.bkp'), 'utf8')).value, v);
+      }
+    });
+
+    it('records history again once saveInterval has passed', async function () {
+      const s = await load({ persist: 'on', historyCount: 3, saveInterval: '1000' });
+      await s.update(1);
+      s.lastHistoryTs -= 1000;  // pretend the interval has passed
+      await s.update(2);
+      await s.update(3);
+      assert.deepEqual(s.history.map(h => h.val), [2, 1]);
+      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 3);
     });
   });
 });

@@ -161,7 +161,7 @@
 
 <div class="form-tips">
     <span>Tip: <i style="width:24px; text-align:center" class="fa fa-area-chart"></i>
-    This parameter can be used for reducing disk writes which can be useful if performance is critical and state changes quickly.</span>
+    Limits how often a history entry is recorded when the state changes quickly. Every change is still saved to disk.</span>
 </div>
 
 <h4><i class="fa fa-cog"></i> Optional metadata</h4>
@@ -229,7 +229,7 @@
      </ul>
      New states default to <i>On</i>. States created with an earlier version use <i>On</i> if History is above 0, otherwise <i>Off</i>.</li>
    <li><b>History</b> - Number of state changes to keep. Set to 0 for no history. History no longer controls whether state is saved; use Persist for that.</li>
-   <li><b>Saving interval</b> - Rate limit in ms for recording history and saving state changes. 0 (or empty) records and saves every state change.</li>
+   <li><b>Saving interval</b> - Minimum time in ms between history entries. State changes are always saved (if Persist is on); this only limits how often history is recorded. 0 (or empty) records every state change.</li>
  </ul>
  <h4>Optional Metadata</h4>
  Expand the state definition with metadata. This can be used to guarantee a data type, convert units, and provide tags to help find state nodes.
