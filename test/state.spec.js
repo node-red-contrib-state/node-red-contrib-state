@@ -240,8 +240,8 @@ describe('shared state persistence', function () {
   });
 
   describe('saveInterval (#13)', function () {
-    for (const [label, saveInterval] of [['missing', undefined], ['empty', ''], ['invalid', 'abc']]) {
-      it(`treats a ${label} saveInterval as 0`, async function () {
+    for (const [label, saveInterval] of [['a missing', undefined], ['an empty', ''], ['an invalid', 'abc']]) {
+      it(`treats ${label} saveInterval as 0`, async function () {
         const config = { persist: 'on', historyCount: 3 };
         if (saveInterval !== undefined) { config.saveInterval = saveInterval; }
         const s = await load(config);
