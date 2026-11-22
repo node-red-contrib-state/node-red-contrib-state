@@ -171,6 +171,25 @@ describe('shared state persistence', function () {
       assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 5);
     });
 
+    it('finishes a pending write before close, so a redeploy loads the new value', async function () {
+      const s = await load({ persist: 'on', historyCount: 0, saveInterval: '0' });
+      const origRename = fs.promises.rename;
+      fs.promises.rename = async (from, to) => {
+        await new Promise(r => setTimeout(r, 50));
+        return origRename(from, to);
+      };
+      try {
+        s.update(1);                // not awaited: write is still in flight
+        await helper.unload();      // redeploy: close the old instance...
+      } finally {
+        fs.promises.rename = origRename;
+      }
+      const s2 = await load({ persist: 'on', historyCount: 0, saveInterval: '0' });  // ...start a new one
+      assert.equal(s2.value, 1);
+      assert.equal(fs.existsSync(stateFile('st.tmp')), false);
+      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 1);
+    });
+
     it('removes a stale .tmp file on load and loads the main file', async function () {
       fs.mkdirSync(stateDir());
       fs.writeFileSync(stateFile('st'), JSON.stringify({ value: 7, prev: 6, timestamp: 1, history: [] }));
