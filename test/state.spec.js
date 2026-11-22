@@ -201,43 +201,75 @@ describe('shared state persistence', function () {
   });
 
   describe('"on+backup"', function () {
-    it('keeps the previous file as <file>.bkp', async function () {
-      const s = await load({ persist: 'on+backup', historyCount: 0, saveInterval: '0' });
-      await s.update(1);
-      assert.equal(fs.existsSync(stateFile('st.bkp')), false);
-      await s.update(2);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 2);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st.bkp'), 'utf8')).value, 1);
+    const read = (name) => fs.readFileSync(stateFile(name), 'utf8');
+
+    it('writes the same content to <file>.bkp as to <file> on every save', async function () {
+      const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
+      for (const v of [1, 2]) {
+        await s.update(v);
+        assert.equal(JSON.parse(read('st')).value, v);
+        assert.equal(read('st.bkp'), read('st'));
+      }
+      assert.deepEqual(fs.readdirSync(stateDir()).sort(), ['st', 'st.bkp']);
     });
 
-    it('restores from .bkp when the main file is corrupt', async function () {
+    it('writes both files atomically via their own .tmp and never rotates', async function () {
+      const s = await load({ persist: 'on+backup', historyCount: 0, saveInterval: '0' });
+      const renames = [];
+      const origRename = fs.promises.rename;
+      fs.promises.rename = async (from, to) => { renames.push([from, to]); return origRename(from, to); };
+      try {
+        await s.update(1);
+        await s.update(2);
+      } finally {
+        fs.promises.rename = origRename;
+      }
+      const f = s.stateFile;
+      assert.deepEqual(renames, [
+        [f + '.tmp', f], [f + '.bkp.tmp', f + '.bkp'],
+        [f + '.tmp', f], [f + '.bkp.tmp', f + '.bkp'],
+      ]);
+    });
+
+    it('syncs the state directory after each rename, and only warns if that fails', async function () {
+      if (process.platform === 'win32') { this.skip(); }
+      const s = await load({ persist: 'on+backup', historyCount: 0, saveInterval: '0' });
+      const dirPath = path.dirname(s.stateFile);
+      const opened = [];
+      const origOpen = fs.promises.open;
+      fs.promises.open = async (p, flags) => {
+        opened.push(p);
+        if (p === dirPath) { throw Object.assign(new Error('EISDIR test'), { code: 'EISDIR' }); }
+        return origOpen(p, flags);
+      };
+      try {
+        await s.update(1);
+      } finally {
+        fs.promises.open = origOpen;
+      }
+      assert.equal(opened.filter(p => p === dirPath).length, 2);
+      assert.equal(JSON.parse(read('st')).value, 1);
+      assert.equal(read('st.bkp'), read('st'));
+      assert.equal(warnings().filter(m => /Unable to sync state directory/.test(m)).length, 2);
+    });
+
+    it('restores from .bkp when the main file is corrupt and keeps it as .corrupt', async function () {
       fs.mkdirSync(stateDir());
-      fs.writeFileSync(stateFile('st'), '{"value": 3, "prev"');  // truncated write
-      fs.writeFileSync(stateFile('st.bkp'), JSON.stringify({ value: 2, prev: 1, timestamp: 1, history: [{ val: 2, ts: 1 }] }));
+      const corrupt = '{"value": 3, "prev"';  // truncated write
+      const backup = JSON.stringify({ value: 2, prev: 1, timestamp: 1, history: [{ val: 2, ts: 1 }] });
+      fs.writeFileSync(stateFile('st'), corrupt);
+      fs.writeFileSync(stateFile('st.bkp'), backup);
       const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
       assert.equal(s.value, 2);
       assert.equal(s.initialized, true);
-      assert.ok(warnings().some(m => /restoring from backup/.test(m)), 'expected a restore warning');
-      // The main file is repaired, so the next save can't push the corrupt file over the backup
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 2);
+      assert.ok(warnings().some(m => /not valid, restoring from backup/.test(m)), 'expected a restore warning');
+      assert.equal(read('st.corrupt'), corrupt);
+      assert.deepEqual(JSON.parse(read('st')), JSON.parse(backup));
+      assert.equal(read('st.bkp'), backup);
       await s.update(4);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st.bkp'), 'utf8')).value, 2);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 4);
-    });
-
-    it('overwrites a corrupt main file instead of rotating it to .bkp', async function () {
-      fs.mkdirSync(stateDir());
-      fs.writeFileSync(stateFile('st'), '{"value": 3, "prev"');  // corrupt, no backup
-      const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
-      assert.equal(s.initialized, false);
-      assert.ok(warnings().some(m => /not valid/.test(m)));
-      await s.update(1);
-      assert.equal(fs.existsSync(stateFile('st.bkp')), false, 'corrupt file must not become the backup');
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 1);
-      // Once the main file is valid again, rotation resumes
-      await s.update(2);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st.bkp'), 'utf8')).value, 1);
-      assert.equal(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).value, 2);
+      assert.equal(JSON.parse(read('st')).value, 4);
+      assert.equal(read('st.bkp'), read('st'));
+      assert.equal(read('st.corrupt'), corrupt);
     });
 
     it('restores from .bkp when the main file is missing', async function () {
@@ -246,6 +278,35 @@ describe('shared state persistence', function () {
       const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
       assert.equal(s.value, 5);
       assert.ok(warnings().some(m => /missing, restoring from backup/.test(m)));
+      assert.equal(JSON.parse(read('st')).value, 5);
+      assert.equal(fs.existsSync(stateFile('st.corrupt')), false);
+    });
+
+    it('reports the main file error when both files are unusable', async function () {
+      fs.mkdirSync(stateDir());
+      fs.writeFileSync(stateFile('st'), '{"value": 3, "prev"');
+      fs.writeFileSync(stateFile('st.bkp'), 'not json either');
+      const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
+      assert.equal(s.initialized, false);
+      const w = warnings();
+      assert.ok(w.some(m => m.startsWith('State file is not valid, ignoring: ' + s.stateFile + ' (')), w.join('\n'));
+      assert.ok(!w.some(m => /restoring from backup|backup file is not valid/.test(m)), w.join('\n'));
+      assert.equal(fs.existsSync(stateFile('st.corrupt')), false);
+      // The next save replaces both
+      await s.update(1);
+      assert.equal(JSON.parse(read('st')).value, 1);
+      assert.equal(read('st.bkp'), read('st'));
+    });
+
+    it('removes stale .tmp files of both the main file and the backup on load', async function () {
+      fs.mkdirSync(stateDir());
+      fs.writeFileSync(stateFile('st'), JSON.stringify({ value: 7, prev: 6, timestamp: 1, history: [] }));
+      fs.writeFileSync(stateFile('st.tmp'), '{"value": 8, "pr');
+      fs.writeFileSync(stateFile('st.bkp.tmp'), '{"value": 8, "pr');
+      const s = await load({ persist: 'on+backup', historyCount: 2, saveInterval: '0' });
+      assert.equal(s.value, 7);
+      assert.equal(fs.existsSync(stateFile('st.tmp')), false);
+      assert.equal(fs.existsSync(stateFile('st.bkp.tmp')), false);
     });
 
     it('does not restore from .bkp in "on" mode', async function () {

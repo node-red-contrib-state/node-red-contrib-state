@@ -79,8 +79,8 @@ onto the filesystem:
 | Persist | Behavior |
 |---|---|
 | Off | State and history are kept in memory only and nothing is written to disk. An existing state file is still loaded on startup. |
-| On | State and history are saved on each state change. The file is written atomically: the new content goes to `<name>.tmp`, which is then renamed over `<name>`, so a crash or power loss never leaves a half-written state file. |
-| On, keep backup file | As _On_, and the previous state file is kept as `<name>.bkp`. On startup, if `<name>` is missing or not valid JSON, the state is restored from `<name>.bkp` and a warning is logged. A main file that is not valid JSON is never rotated to `<name>.bkp`; it is overwritten instead. |
+| On | State and history are saved on each state change. The file is written atomically: the new content goes to `<name>.tmp`, is flushed to disk and then renamed over `<name>`, so a crash or power loss never leaves a half-written state file. |
+| On, keep backup file | As _On_, and after each save the same content is also written (atomically) to `<name>.bkp`. On startup, if `<name>` is missing or not valid JSON and `<name>.bkp` is valid, the state is restored from the backup, `<name>` is rewritten from it and a warning is logged. A `<name>` that is not valid JSON is kept as `<name>.corrupt`. |
 
 New state nodes default to _On_. A backup file is only kept when you select it.
 
@@ -89,7 +89,7 @@ behave as before: _On_ if _History_ is greater than 0, otherwise _Off_. The edit
 you open the node. _History_ no longer controls whether state is saved; it only sets how many history entries
 are kept.
 
-Leftover `<name>.tmp` files from an interrupted write are removed on startup.
+Leftover `<name>.tmp` and `<name>.bkp.tmp` files from an interrupted write are removed on startup.
 
 The _Saving interval_ (ms) rate-limits recording history and saving to disk. A missing, empty or invalid
 value is treated as 0, meaning every state change is recorded and saved.

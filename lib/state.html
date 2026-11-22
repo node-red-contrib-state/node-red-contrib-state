@@ -224,8 +224,8 @@
    <li><b>Persist</b> - Whether the state survives a Node-RED restart.
      <ul>
        <li><i>Off</i> - State and history are kept in memory only. Nothing is written to disk, but an existing state file is still loaded at startup.</li>
-       <li><i>On</i> - State and history are written to disk. Each write goes to a temporary file that then replaces the state file, so a crash or power loss never leaves a half-written file.</li>
-       <li><i>On, keep backup file</i> - As <i>On</i>, and the previous state file is kept as <code>&lt;name&gt;.bkp</code>. If the state file is missing or unreadable on startup, it is restored from the backup and a warning is logged. A state file that is not valid JSON is overwritten, never rotated into the backup.</li>
+       <li><i>On</i> - State and history are written to disk. Each write goes to a temporary file that is flushed and then replaces the state file, so a crash or power loss never leaves a half-written file.</li>
+       <li><i>On, keep backup file</i> - As <i>On</i>, and each save also writes the same content to <code>&lt;name&gt;.bkp</code>. If the state file is missing or not valid JSON on startup, it is restored from the backup and a warning is logged. A state file that is not valid JSON is kept as <code>&lt;name&gt;.corrupt</code>.</li>
      </ul>
      New states default to <i>On</i>. States created with an earlier version use <i>On</i> if History is above 0, otherwise <i>Off</i>.</li>
    <li><b>History</b> - Number of state changes to keep. Set to 0 for no history. History no longer controls whether state is saved; use Persist for that.</li>
