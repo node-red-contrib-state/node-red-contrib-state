@@ -319,6 +319,41 @@ describe('shared state persistence', function () {
     });
   });
 
+  describe('historyCount <= 0', function () {
+    const oldHistory = [{ val: 7, ts: 3 }, { val: 6, ts: 2 }, { val: 5, ts: 1 }];
+
+    for (const historyCount of [0, '0', -1]) {
+      it(`drops old history from the file (historyCount ${JSON.stringify(historyCount)})`, async function () {
+        fs.mkdirSync(stateDir());
+        fs.writeFileSync(stateFile('st'), JSON.stringify({ value: 7, prev: 6, timestamp: 3, history: oldHistory }));
+        const s = await load({ persist: 'on', historyCount, saveInterval: '0' });
+        assert.equal(s.value, 7);
+        assert.deepEqual(s.history, []);
+        assert.deepEqual(s.exposedState().history, []);
+        await s.update(8);
+        const saved = JSON.parse(fs.readFileSync(stateFile('st'), 'utf8'));
+        assert.equal(saved.value, 8);
+        assert.deepEqual(saved.history, []);
+      });
+    }
+
+    it('drops old history when initialized from the global context', async function () {
+      const s = await load({ persist: 'on', historyCount: 0, saveInterval: '0' });
+      s.initFromObj({ value: 7, prev: 6, timestamp: 3, history: oldHistory });
+      assert.equal(s.value, 7);
+      assert.deepEqual(s.history, []);
+      assert.deepEqual(s.globalState.st.history, []);
+    });
+
+    it('clears history set in memory before saving', async function () {
+      const s = await load({ persist: 'on', historyCount: 0, saveInterval: '0' });
+      s.history = oldHistory.slice();
+      await s.update(1);
+      assert.deepEqual(s.history, []);
+      assert.deepEqual(JSON.parse(fs.readFileSync(stateFile('st'), 'utf8')).history, []);
+    });
+  });
+
   describe('saveInterval (#13)', function () {
     for (const [label, saveInterval] of [['a missing', undefined], ['an empty', ''], ['an invalid', 'abc']]) {
       it(`treats ${label} saveInterval as 0`, async function () {
