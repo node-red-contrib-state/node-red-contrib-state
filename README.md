@@ -22,6 +22,38 @@ in determining room HVAC profile.
 These nodes provide a place to represent that logical state, share it with other
 nodes, persist it, keep history, and provide state change triggers for flows.
 
+## Why not just link nodes?
+
+Link in/out nodes pass *events*: a message travels at the moment it is sent,
+and then it is gone. Shared state holds a *value* that is there whenever you
+need it. That makes a difference as soon as several flows depend on the same
+thing:
+
+| | Link in/out | Shared state |
+|---|---|---|
+| Current value on demand | No, only the next message | Yes, via `global.state` (function or Change node) |
+| New or redeployed flow | Waits for the next event | get-shared-state sends the current value on startup, if the state has one (_Trigger on init_, on by default) |
+| Repeated identical values | Every message is passed on | Only real changes trigger |
+| Previous value, time of change | Track it yourself | `prev`, `timestamp`, `history` in every message |
+| After a Node-RED restart | Nothing | Value restored (with _Persist_ on) |
+| Wiring | Every sender knows its receivers | Senders and receivers only share a state name |
+
+With a handful of states, links are fine. With dozens of sensors and many
+flows reacting to them, link wiring gets hard to follow, and each flow ends up
+keeping its own copy of "what is the current state". Shared state keeps that
+in one place.
+
+Typical uses in a home automation setup:
+
+* **Window open** – set by the window contacts, read by the heating control,
+  an alarm for windows left open too long, and a dashboard.
+* **Garage door / front door status** – one state, used by notifications,
+  lighting, and an "everything closed?" check at night.
+* **Rain status** – set by a weather service or rain sensor, read by
+  irrigation and by flows that warn about open roof windows.
+* **Waste collection type** – set once a day from a calendar, read by
+  displays and reminder flows whenever they need it.
+
 ## Data Typing
 
 State nodes can specify data types offering inbound type conversions, min/max
