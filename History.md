@@ -1,4 +1,4 @@
-1.7.0 - unreleased
+1.7.0 - 11/26/2026
 ==================
 
   * Fixed listener leak on partial deploys (#16, #25)
