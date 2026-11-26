@@ -4,9 +4,9 @@
   "version": "1.6.1",
   "description": "Shared state with persistence, notification, and history",
   "license": "MIT",
-  "homepage": "https://github.com/lorenwest/node-red-contrib-state",
+  "homepage": "https://github.com/node-red-contrib-state/node-red-contrib-state",
   "bugs": {
-    "url": "https://github.com/lorenwest/node-red-contrib-state/issues"
+    "url": "https://github.com/node-red-contrib-state/node-red-contrib-state/issues"
   },
   "dependencies": {
     "convert-units": "^2.3.4"
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lorenwest/node-red-contrib-state.git"
+    "url": "git+https://github.com/node-red-contrib-state/node-red-contrib-state.git"
   },
   "keywords": [
     "node-red",

@@ -4,7 +4,7 @@ Shared state with persistence, notification, and history
 This contributes [Node-RED](http://nodered.org/) nodes for defining logical state,
 sharing that state across nodes, tracking history, and triggering flows based on change.
 
-![](https://github.com/lorenwest/node-red-contrib-state/blob/master/img/AnimatedExample.gif)
+![](https://github.com/node-red-contrib-state/node-red-contrib-state/blob/master/img/AnimatedExample.gif)
 
 Shared state can be saved to disk, remaining stable across reboots of Node-RED. Whether it is saved
 is set per state by the _Persist_ option (see _Shared State Storage_ below), independent of _History_.
@@ -70,7 +70,7 @@ let isRoomOccupied = global.get("state").isRoomOccupied.value;
 
 Another useful way to obtain shared state is to add it to a message using the _Change_ node:
 
-![](https://raw.githubusercontent.com/lorenwest/node-red-contrib-state/master/img/ChangeNode.png)
+![](https://raw.githubusercontent.com/node-red-contrib-state/node-red-contrib-state/master/img/ChangeNode.png)
 
 ## Shared State Storage
 
@@ -130,7 +130,7 @@ The [examples](examples) directory contains flows you can import with _Import_ i
 
 ## See Also
 
-* [Representing Binary State with Confidence](https://github.com/lorenwest/node-red-contrib-state/wiki/Binary-State-with-External-Validation)
+* [Representing Binary State with Confidence](https://github.com/node-red-contrib-state/node-red-contrib-state/wiki/Binary-State-with-External-Validation)
 
 ## Installation
 
@@ -142,4 +142,4 @@ The [examples](examples) directory contains flows you can import with _Import_ i
 
 ## License
 
-MIT License. See [LICENSE.txt](https://raw.githubusercontent.com/lorenwest/node-red-contrib-state/master/LICENSE.txt) for more details.
+MIT License. See [LICENSE.txt](https://raw.githubusercontent.com/node-red-contrib-state/node-red-contrib-state/master/LICENSE.txt) for more details.
