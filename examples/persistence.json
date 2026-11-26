@@ -1,0 +1,99 @@
+[
+    {
+        "id": "b1c2d3e4f5a60001",
+        "type": "tab",
+        "label": "Shared state: persistence",
+        "disabled": false,
+        "info": "The shared state `examplePersisted` is saved to `./shared-state/examplePersisted` on every change, with a mirror in `examplePersisted.bkp` (Persist: On, keep backup file). It keeps the last 5 values as history.\n\nPress the inject button a few times, then restart Node-RED: the value and history are restored and sent to the debug sidebar on startup."
+    },
+    {
+        "id": "b1c2d3e4f5a60002",
+        "type": "shared-state",
+        "name": "examplePersisted",
+        "lbl": "Example persisted state",
+        "tags": "",
+        "historyCount": "5",
+        "dataType": "num",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "on+backup"
+    },
+    {
+        "id": "b1c2d3e4f5a60003",
+        "type": "inject",
+        "z": "b1c2d3e4f5a60001",
+        "name": "Set to timestamp",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "b1c2d3e4f5a60004"
+            ]
+        ]
+    },
+    {
+        "id": "b1c2d3e4f5a60004",
+        "type": "set-shared-state",
+        "z": "b1c2d3e4f5a60001",
+        "state": "b1c2d3e4f5a60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 400,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "b1c2d3e4f5a60005",
+        "type": "get-shared-state",
+        "z": "b1c2d3e4f5a60001",
+        "state": "b1c2d3e4f5a60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "b1c2d3e4f5a60006"
+            ]
+        ]
+    },
+    {
+        "id": "b1c2d3e4f5a60006",
+        "type": "debug",
+        "z": "b1c2d3e4f5a60001",
+        "name": "History",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "state.history",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 160,
+        "wires": []
+    }
+]

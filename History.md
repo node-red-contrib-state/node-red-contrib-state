@@ -1,3 +1,19 @@
+1.7.0 - unreleased
+==================
+
+  * Fixed listener leak on partial deploys (#16, #25)
+  * Ignore undefined values instead of crashing (#18, #26)
+  * New Persist option (off / on / on + backup) with atomic writes,
+    backup recovery and .corrupt preservation (#13, #27)
+  * Every change is persisted; saveInterval only rate-limits history
+    ("History interval")
+  * Removed lodash, mkdirp, is-valid-var-name; CI moved to GitHub Actions
+  * Added engines (node >=14) and node-red.version (>=3.0.0); engines/node-red.version
+    reflect the APIs used; CI covers Node 18/20/22 with Node-RED 4.
+  * Added example flows (examples/basic.json, examples/persistence.json)
+  * Package contents limited to lib/ and examples/ via "files"
+  * npm audit --omit=dev: no findings
+
 1.6.1 - 01/09/2022
 ==================
 
