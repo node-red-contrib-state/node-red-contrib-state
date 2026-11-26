@@ -1,3 +1,10 @@
+1.7.0 - unreleased
+==================
+
+  * Added example flows (examples/basic.json, examples/persistence.json)
+  * Added engines (node >=14) and node-red.version (>=3.0.0); engines/node-red.version reflect the
+    APIs used; CI covers Node 18/20/22 with Node-RED 4.
+
 1.6.1 - 01/09/2022
 ==================
 

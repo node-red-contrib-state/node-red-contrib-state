@@ -1,0 +1,99 @@
+[
+    {
+        "id": "a1b2c3d4e5f60001",
+        "type": "tab",
+        "label": "Shared state: basic",
+        "disabled": false,
+        "info": "Press the inject button to set the shared state `exampleCounter` to the current timestamp.\nThe get-shared-state node sends the new value to the debug sidebar on every change.\n\nPersist is set to Off, so nothing is written to disk."
+    },
+    {
+        "id": "a1b2c3d4e5f60002",
+        "type": "shared-state",
+        "name": "exampleCounter",
+        "lbl": "Example counter",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "num",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "a1b2c3d4e5f60003",
+        "type": "inject",
+        "z": "a1b2c3d4e5f60001",
+        "name": "Set to timestamp",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "a1b2c3d4e5f60004"
+            ]
+        ]
+    },
+    {
+        "id": "a1b2c3d4e5f60004",
+        "type": "set-shared-state",
+        "z": "a1b2c3d4e5f60001",
+        "state": "a1b2c3d4e5f60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 400,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "a1b2c3d4e5f60005",
+        "type": "get-shared-state",
+        "z": "a1b2c3d4e5f60001",
+        "state": "a1b2c3d4e5f60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "a1b2c3d4e5f60006"
+            ]
+        ]
+    },
+    {
+        "id": "a1b2c3d4e5f60006",
+        "type": "debug",
+        "z": "a1b2c3d4e5f60001",
+        "name": "Value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 160,
+        "wires": []
+    }
+]

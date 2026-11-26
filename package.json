@@ -11,6 +11,9 @@
   "dependencies": {
     "convert-units": "^2.3.4"
   },
+  "engines": {
+    "node": ">=14"
+  },
   "devDependencies": {
     "mocha": "^10.7.3",
     "node-red": "^4.0.9",
@@ -42,6 +45,7 @@
     "machine"
   ],
   "node-red": {
+    "version": ">=3.0.0",
     "nodes": {
       "shared-state": "lib/state.js",
       "get-shared-state": "lib/getState.js",

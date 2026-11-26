@@ -6,7 +6,8 @@ sharing that state across nodes, tracking history, and triggering flows based on
 
 ![](https://github.com/lorenwest/node-red-contrib-state/blob/master/img/AnimatedExample.gif)
 
-Shared state can be persisted, remaining stable across reboots of Node-RED.
+Shared state can be saved to disk, remaining stable across reboots of Node-RED. Whether it is saved
+is set per state by the _Persist_ option (see _Shared State Storage_ below), independent of _History_.
 
 ## Logical State
 
@@ -113,6 +114,19 @@ Example settings.js:
 See the 
 [Global Context](https://nodered.org/docs/user-guide/writing-functions#global-context) 
 discussion for further information.
+
+## Examples
+
+The [examples](examples) directory contains flows you can import with _Import_ in the Node-RED menu
+(or from _Import → Examples → node-red-contrib-state_ once the package is installed):
+
+* [basic.json](examples/basic.json): an inject node sets the shared state `exampleCounter` through a
+  set-shared-state node, and a get-shared-state node sends every change to a debug node. _Persist_ is
+  _Off_, so nothing is written to disk.
+* [persistence.json](examples/persistence.json): the shared state `examplePersisted` with _Persist_ set to
+  _On, keep backup file_ and _History_ 5. Every change is saved to `examplePersisted` and
+  `examplePersisted.bkp`, and the debug node shows `msg.state.history`. After a restart of Node-RED the
+  value and history are restored.
 
 ## See Also
 
