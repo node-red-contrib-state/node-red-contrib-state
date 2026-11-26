@@ -46,6 +46,9 @@
       numMax: {value:null},
       unit: {value:null},         // Valid unit defined in npm:convert-units
       saveInterval: {value: "0", required:true},
+      // Nodes saved before this option existed don't have it; the runtime and
+      // oneditprepare then use "on" if historyCount > 0, otherwise "off".
+      persist: {value: "on"},  // off, on, on+backup
     },
     label: function() {
       if (this.lbl) {
@@ -58,6 +61,11 @@
     },
     oneditprepare: function () {
       let node = this;
+
+      // Migrate nodes created before the persist option existed
+      if (["off", "on", "on+backup"].indexOf(node.persist) < 0) {
+        $("#node-config-input-persist").val(parseInt(node.historyCount, 10) > 0 ? "on" : "off");
+      }
 
       // Input validations
       $("#node-config-input-name").change(function () {
@@ -128,23 +136,32 @@
 </div>
 
 <div class="form-row">
+    <label for="node-config-input-persist"><i class="fa fa-hdd-o fa-fw"></i> Persist</label>
+    <select style="width:250px" id="node-config-input-persist">
+      <option value="off">Off (memory only)</option>
+      <option value="on">On</option>
+      <option value="on+backup">On, keep backup file</option>
+    </select>
+</div>
+
+<div class="form-row">
     <label for="node-config-input-historyCount"><i class="fa fa-area-chart fa-fw"></i> History</label>
     Keep <input style="width: 50px; text-align: right; margin:0 4px; padding: 0px 6px 0 0px;" type="number" min="0" id="node-config-input-historyCount"> items
 </div>
 
 <div class="form-tips">
     <span>Tip: <i style="width:24px; text-align:center" class="fa fa-area-chart"></i> 
-    Keep this number trim, as history is stored in memory and written to disk on state change.</span>
+    Keep this number trim, as history is stored in memory and written to disk with the state.</span>
 </div>
 
 <div class="form-row">
-    <label for="node-config-input-saveInterval"><i class="fa fa-area-chart fa-fw"></i> Saving interval</label>
+    <label for="node-config-input-saveInterval"><i class="fa fa-area-chart fa-fw"></i> History interval</label>
     <input type="number" style="width: 100px" min="0" id="node-config-input-saveInterval"> ms
 </div>
 
 <div class="form-tips">
     <span>Tip: <i style="width:24px; text-align:center" class="fa fa-area-chart"></i>
-    This parameter can be used for reducing disk writes which can be useful if performance is critical and state changes quickly.</span>
+    Limits how often a history entry is recorded when the state changes quickly. Every change is still saved to disk.</span>
 </div>
 
 <h4><i class="fa fa-cog"></i> Optional metadata</h4>
@@ -204,8 +221,15 @@
  <ul>
    <li><b>State Name</b> - Name of the persistent shared state. This is the key used to identify the state, and must be a valid JavaScript variable name.</li>
    <li><b>Label</b> - The label that appears on the state node.</li>
-   <li><b>History</b> - Number of state changes to keep. Set to 0 for no state save or history.</li>
-   <li><b>Saving interval</b> - Rate limit for saving state changes. Defaults to 0 when every state change is saved to disk.</li>
+   <li><b>Persist</b> - Whether the state survives a Node-RED restart.
+     <ul>
+       <li><i>Off</i> - State and history are kept in memory only. Nothing is written to disk, but an existing state file is still loaded at startup.</li>
+       <li><i>On</i> - State and history are written to disk. Each write goes to a temporary file that is flushed and then replaces the state file, so a crash or power loss never leaves a half-written file.</li>
+       <li><i>On, keep backup file</i> - As <i>On</i>, and each save also writes the same content to <code>&lt;name&gt;.bkp</code>. If the state file is missing or not valid JSON on startup, it is restored from the backup and a warning is logged. A state file that is not valid JSON is kept as <code>&lt;name&gt;.corrupt</code>.</li>
+     </ul>
+     New states default to <i>On</i>. States created with an earlier version use <i>On</i> if History is above 0, otherwise <i>Off</i>.</li>
+   <li><b>History</b> - Number of state changes to keep. Set to 0 for no history. History no longer controls whether state is saved; use Persist for that.</li>
+   <li><b>History interval</b> - Minimum time in ms between history entries. State changes are always saved (if Persist is on); this only limits how often history is recorded. 0 (or empty) records every state change.</li>
  </ul>
  <h4>Optional Metadata</h4>
  Expand the state definition with metadata. This can be used to guarantee a data type, convert units, and provide tags to help find state nodes.

@@ -6,7 +6,7 @@ sharing that state across nodes, tracking history, and triggering flows based on
 
 ![](https://github.com/lorenwest/node-red-contrib-state/blob/master/img/AnimatedExample.gif)
 
-Shared state with history is persisted, remaining stable across reboots of Node-RED.
+Shared state can be persisted, remaining stable across reboots of Node-RED.
 
 ## Logical State
 
@@ -73,8 +73,28 @@ Another useful way to obtain shared state is to add it to a message using the _C
 
 ## Shared State Storage
 
-Shared state is saved onto the filesystem, along with history, on each state change. This assures stability
-across server restarts.
+Each shared state node has a _Persist_ option that controls whether its value and history are saved
+onto the filesystem:
+
+| Persist | Behavior |
+|---|---|
+| Off | State and history are kept in memory only and nothing is written to disk. An existing state file is still loaded on startup. |
+| On | State and history are saved on each state change. The file is written atomically: the new content goes to `<name>.tmp`, is flushed to disk and then renamed over `<name>`, so a crash or power loss never leaves a half-written state file. |
+| On, keep backup file | As _On_, and after each save the same content is also written (atomically) to `<name>.bkp`. On startup, if `<name>` is missing or not valid JSON and `<name>.bkp` is valid, the state is restored from the backup, `<name>` is rewritten from it and a warning is logged. A `<name>` that is not valid JSON is kept as `<name>.corrupt`. |
+
+New state nodes default to _On_. A backup file is only kept when you select it.
+
+State nodes created with an earlier version of this package don't have the _Persist_ option yet. They
+behave as before: _On_ if _History_ is greater than 0, otherwise _Off_. The editor shows that value when
+you open the node. _History_ no longer controls whether state is saved; it only sets how many history entries
+are kept.
+
+Leftover `<name>.tmp` and `<name>.bkp.tmp` files from an interrupted write are removed on startup.
+
+The _History interval_ (ms, config key `saveInterval`) rate-limits recording history: a new history entry is only added if at least
+this much time has passed since the previous one. It does not affect saving; with _Persist_ on, every state
+change is written to disk. A missing, empty or invalid value is treated as 0, meaning every state change is
+recorded in history.
 
 Each state is written to a file in a _./shared-state_ directory within the current Node-RED application
 directory. If that isn't a good place to save state on your system, the global context _sharedStateDir_ 
