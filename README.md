@@ -29,9 +29,13 @@ limiting, and unit of measue awareness and conversion.
 
 ## Setting State
 
-State is set by sending the value to the setState node in the _msg.payload_. After saving
-to disk, the new state is made available to all mechanisms described in the _Getting State_
-section below.
+State is set by sending the value to the setState node in the _msg.payload_. The new state is
+then made available to all mechanisms described in the _Getting State_ section below. It is
+saved to disk only if the state node's _Persist_ option is on (see _Shared State Storage_):
+
+- With _Persist_ off, the new state is available immediately.
+- With _Persist_ on, the new state is available once it has been saved. If saving fails, an
+  error is logged and the getters keep the previous state.
 
 If data type is specified, setting state will assure the correct data type is represented.
 
@@ -39,7 +43,7 @@ State nodes with compatible units of measure can be chaned for unit of measure c
 
 ## Getting State
 
-Once state is set and persisted using the _Setting State_ section above, the new state is
+Once state is set using the _Setting State_ section above, the new state is
 made available with the getState node and in the global state context.
 
 ### The getState Node
@@ -97,9 +101,10 @@ this much time has passed since the previous one. It does not affect saving; wit
 change is written to disk. A missing, empty or invalid value is treated as 0, meaning every state change is
 recorded in history.
 
-Each state is written to a file in a _./shared-state_ directory within the current Node-RED application
-directory. If that isn't a good place to save state on your system, the global context _sharedStateDir_ 
-value can be used to override this default. 
+Each state is written to a file in a _./shared-state_ directory. This path is relative to the current
+working directory of the Node-RED process, which is not necessarily the Node-RED user directory
+(_userDir_). If that isn't a good place to save state on your system, the global context _sharedStateDir_
+value can be used to override this default, for example with an absolute path.
 
 This can be placed in the _settings.js_ file under the _functionGlobalContext_ property.
 
