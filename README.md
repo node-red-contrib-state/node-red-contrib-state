@@ -132,6 +132,18 @@ The [examples](examples) directory contains flows you can import with _Import_ i
   _On, keep backup file_ and _History_ 5. Every change is saved to `examplePersisted` and
   `examplePersisted.bkp`, and the debug node shows `msg.state.history`. After a restart of Node-RED the
   value and history are restored.
+* [global-context.json](examples/global-context.json): the shared state `exampleRoomOccupied` is read from
+  the global context on every change, once by a function node with
+  `global.get("state").exampleRoomOccupied.value` and once by a change node that sets `msg.occupied` from
+  `global.state.exampleRoomOccupied.value`. Both send the value to a debug node.
+* [units.json](examples/units.json): `exampleTempC` (unit C) is passed through a get-shared-state node to
+  the set-shared-state node of `exampleTempF` (unit F, precision 1). Because the message carries the source
+  unit in `msg.state.config`, the value is converted, for example 21.5 C to 70.7 F.
+* [logical-state.json](examples/logical-state.json): a function node derives the logical state
+  `examplePersonInRoom` from the physical states `exampleMotion` and `exampleDoorOpen` (motion detected
+  while the door is closed), and a get-shared-state node sends it to a debug node.
+
+All examples except _persistence.json_ use _Persist_ _Off_ and write nothing to disk.
 
 ## See Also
 

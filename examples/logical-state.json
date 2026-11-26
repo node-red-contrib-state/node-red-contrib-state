@@ -1,0 +1,290 @@
+[
+    {
+        "id": "e1f2a3b4c5d60001",
+        "type": "tab",
+        "label": "Shared state: logical state",
+        "disabled": false,
+        "info": "Use the inject buttons to set the physical states `exampleMotion` and `exampleDoorOpen`.\nWhenever one of them changes, a function node reads both from the global context and derives the logical state `examplePersonInRoom`. The rule is deliberately simple: a person is in the room if motion is detected while the door is closed. The get-shared-state node sends `examplePersonInRoom` to the debug sidebar when it changes.\n\nPersist is set to Off, so nothing is written to disk."
+    },
+    {
+        "id": "e1f2a3b4c5d60002",
+        "type": "shared-state",
+        "name": "exampleMotion",
+        "lbl": "Example motion detected",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "bool",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "e1f2a3b4c5d60003",
+        "type": "shared-state",
+        "name": "exampleDoorOpen",
+        "lbl": "Example door open",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "bool",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "e1f2a3b4c5d60004",
+        "type": "shared-state",
+        "name": "examplePersonInRoom",
+        "lbl": "Example person in room",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "bool",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "e1f2a3b4c5d60005",
+        "type": "inject",
+        "z": "e1f2a3b4c5d60001",
+        "name": "Motion",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "e1f2a3b4c5d60009"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d60006",
+        "type": "inject",
+        "z": "e1f2a3b4c5d60001",
+        "name": "No motion",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 140,
+        "y": 110,
+        "wires": [
+            [
+                "e1f2a3b4c5d60009"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d60007",
+        "type": "inject",
+        "z": "e1f2a3b4c5d60001",
+        "name": "Door open",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "e1f2a3b4c5d6000a"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d60008",
+        "type": "inject",
+        "z": "e1f2a3b4c5d60001",
+        "name": "Door closed",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 150,
+        "y": 230,
+        "wires": [
+            [
+                "e1f2a3b4c5d6000a"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d60009",
+        "type": "set-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 380,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "e1f2a3b4c5d6000a",
+        "type": "set-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60003",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 380,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "e1f2a3b4c5d6000b",
+        "type": "get-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 140,
+        "y": 320,
+        "wires": [
+            [
+                "e1f2a3b4c5d6000d"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d6000c",
+        "type": "get-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60003",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 140,
+        "y": 380,
+        "wires": [
+            [
+                "e1f2a3b4c5d6000d"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d6000d",
+        "type": "function",
+        "z": "e1f2a3b4c5d60001",
+        "name": "Person in room?",
+        "func": "const state = global.get(\"state\");\nconst motion = !!(state.exampleMotion && state.exampleMotion.value);\nconst doorOpen = !!(state.exampleDoorOpen && state.exampleDoorOpen.value);\nmsg.payload = motion && !doorOpen;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 350,
+        "wires": [
+            [
+                "e1f2a3b4c5d6000e"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d6000e",
+        "type": "set-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60004",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 640,
+        "y": 350,
+        "wires": []
+    },
+    {
+        "id": "e1f2a3b4c5d6000f",
+        "type": "get-shared-state",
+        "z": "e1f2a3b4c5d60001",
+        "state": "e1f2a3b4c5d60004",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 460,
+        "wires": [
+            [
+                "e1f2a3b4c5d60010"
+            ]
+        ]
+    },
+    {
+        "id": "e1f2a3b4c5d60010",
+        "type": "debug",
+        "z": "e1f2a3b4c5d60001",
+        "name": "Person in room",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 420,
+        "y": 460,
+        "wires": []
+    }
+]

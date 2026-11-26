@@ -1,0 +1,189 @@
+[
+    {
+        "id": "c1d2e3f4a5b60001",
+        "type": "tab",
+        "label": "Shared state: global context",
+        "disabled": false,
+        "info": "Press one of the inject buttons to set the shared state `exampleRoomOccupied`.\nEvery shared state is also available in the global context under `state`. On each change, a function node reads it with `global.get(\"state\").exampleRoomOccupied.value` and a change node sets `msg.occupied` from `global.state.exampleRoomOccupied.value`. Both send the value to the debug sidebar. Any other message could trigger the same reads.\n\nPersist is set to Off, so nothing is written to disk."
+    },
+    {
+        "id": "c1d2e3f4a5b60002",
+        "type": "shared-state",
+        "name": "exampleRoomOccupied",
+        "lbl": "Example room occupied",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "bool",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "c1d2e3f4a5b60003",
+        "type": "inject",
+        "z": "c1d2e3f4a5b60001",
+        "name": "Occupied",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "c1d2e3f4a5b60005"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4a5b60004",
+        "type": "inject",
+        "z": "c1d2e3f4a5b60001",
+        "name": "Not occupied",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "c1d2e3f4a5b60005"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4a5b60005",
+        "type": "set-shared-state",
+        "z": "c1d2e3f4a5b60001",
+        "state": "c1d2e3f4a5b60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 400,
+        "y": 110,
+        "wires": []
+    },
+    {
+        "id": "c1d2e3f4a5b60006",
+        "type": "get-shared-state",
+        "z": "c1d2e3f4a5b60001",
+        "state": "c1d2e3f4a5b60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "c1d2e3f4a5b60007",
+                "c1d2e3f4a5b60008"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4a5b60007",
+        "type": "function",
+        "z": "c1d2e3f4a5b60001",
+        "name": "Read with global.get()",
+        "func": "let isRoomOccupied = global.get(\"state\").exampleRoomOccupied.value;\nmsg.payload = isRoomOccupied;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 200,
+        "wires": [
+            [
+                "c1d2e3f4a5b60009"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4a5b60008",
+        "type": "change",
+        "z": "c1d2e3f4a5b60001",
+        "name": "Set msg.occupied",
+        "rules": [
+            {
+                "t": "set",
+                "p": "occupied",
+                "pt": "msg",
+                "to": "state.exampleRoomOccupied.value",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 260,
+        "wires": [
+            [
+                "c1d2e3f4a5b6000a"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4a5b60009",
+        "type": "debug",
+        "z": "c1d2e3f4a5b60001",
+        "name": "From function",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c1d2e3f4a5b6000a",
+        "type": "debug",
+        "z": "c1d2e3f4a5b60001",
+        "name": "From change",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "occupied",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 260,
+        "wires": []
+    }
+]

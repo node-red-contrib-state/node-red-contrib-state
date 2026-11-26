@@ -1,0 +1,172 @@
+[
+    {
+        "id": "d1e2f3a4b5c60001",
+        "type": "tab",
+        "label": "Shared state: units",
+        "disabled": false,
+        "info": "Press one of the inject buttons to set the shared state `exampleTempC` (unit C).\nThe get-shared-state node for `exampleTempC` sends `msg.state.config` with the source unit along with the value, so the set-shared-state node for `exampleTempF` (unit F, precision 1) converts it: 21.5 C becomes 70.7 F, 100 C becomes 212 F. A value without `msg.state.config` (for example straight from an inject node) would be stored without conversion.\n\nPersist is set to Off, so nothing is written to disk."
+    },
+    {
+        "id": "d1e2f3a4b5c60002",
+        "type": "shared-state",
+        "name": "exampleTempC",
+        "lbl": "Example temperature (C)",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "num",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "",
+        "numMin": "",
+        "numMax": "",
+        "unit": "C",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "d1e2f3a4b5c60003",
+        "type": "shared-state",
+        "name": "exampleTempF",
+        "lbl": "Example temperature (F)",
+        "tags": "",
+        "historyCount": "0",
+        "dataType": "num",
+        "boolType": "bool",
+        "boolStrTrue": "",
+        "boolStrFalse": "",
+        "precision": "1",
+        "numMin": "",
+        "numMax": "",
+        "unit": "F",
+        "saveInterval": "0",
+        "persist": "off"
+    },
+    {
+        "id": "d1e2f3a4b5c60004",
+        "type": "inject",
+        "z": "d1e2f3a4b5c60001",
+        "name": "21.5 C",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "21.5",
+        "payloadType": "num",
+        "x": 140,
+        "y": 80,
+        "wires": [
+            [
+                "d1e2f3a4b5c60006"
+            ]
+        ]
+    },
+    {
+        "id": "d1e2f3a4b5c60005",
+        "type": "inject",
+        "z": "d1e2f3a4b5c60001",
+        "name": "100 C",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "100",
+        "payloadType": "num",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "d1e2f3a4b5c60006"
+            ]
+        ]
+    },
+    {
+        "id": "d1e2f3a4b5c60006",
+        "type": "set-shared-state",
+        "z": "d1e2f3a4b5c60001",
+        "state": "d1e2f3a4b5c60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 380,
+        "y": 110,
+        "wires": []
+    },
+    {
+        "id": "d1e2f3a4b5c60007",
+        "type": "get-shared-state",
+        "z": "d1e2f3a4b5c60001",
+        "state": "d1e2f3a4b5c60002",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "d1e2f3a4b5c60008"
+            ]
+        ]
+    },
+    {
+        "id": "d1e2f3a4b5c60008",
+        "type": "set-shared-state",
+        "z": "d1e2f3a4b5c60001",
+        "state": "d1e2f3a4b5c60003",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "provideOutput": false,
+        "outputs": 0,
+        "x": 400,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d1e2f3a4b5c60009",
+        "type": "get-shared-state",
+        "z": "d1e2f3a4b5c60001",
+        "state": "d1e2f3a4b5c60003",
+        "name": "",
+        "triggerOnInit": true,
+        "triggerOnChange": true,
+        "x": 160,
+        "y": 300,
+        "wires": [
+            [
+                "d1e2f3a4b5c6000a"
+            ]
+        ]
+    },
+    {
+        "id": "d1e2f3a4b5c6000a",
+        "type": "debug",
+        "z": "d1e2f3a4b5c60001",
+        "name": "Temperature (F)",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 300,
+        "wires": []
+    }
+]
