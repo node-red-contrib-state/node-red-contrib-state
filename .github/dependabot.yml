@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    ignore:
+      # mocha 12+ requires Node >= 20.19; we still test on Node 18
+      # (Node-RED 3/4 users). Revisit when dropping Node 18.
+      - dependency-name: mocha
+        update-types: ["version-update:semver-major"]
+      # Same reason: newer node-red majors drop Node 18.
+      - dependency-name: node-red
+        update-types: ["version-update:semver-major"]
